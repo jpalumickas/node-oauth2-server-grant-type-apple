@@ -40,9 +40,12 @@
     "trailingComma": "es5"
   },
   "keywords": [
+    "oauth",
     "oauth2",
     "oauth2-server",
     "grant-type",
-    "apple"
+    "apple",
+    "jwt",
+    "ios"
   ]
 }
