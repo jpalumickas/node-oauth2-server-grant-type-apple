@@ -63,7 +63,7 @@ Post request to `/oauth/token` with `apple` grant type and provided token:
 
 ```json
 {
-  "grant_type": apple",
+  "grant_type": "apple",
   "client_id": "YOUR_CLIENT_ID",
   "apple_token": "APPLE_JWT_TOKEN"
 }
