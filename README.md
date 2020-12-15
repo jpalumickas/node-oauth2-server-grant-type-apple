@@ -52,7 +52,7 @@ You need to provide Apple App ID in model `appleGrantType`  :
 const options = {
   model: {
     ...model,
-    appGrantType: {
+    appleGrantType: {
       appId: 'com.example.apple.login' // Array also supported
     },
   },
@@ -65,7 +65,8 @@ Post request to `/oauth/token` with `apple` grant type and provided token:
 {
   "grant_type": "apple",
   "client_id": "YOUR_CLIENT_ID",
-  "apple_token": "APPLE_JWT_TOKEN"
+  "apple_token": "APPLE_JWT_TOKEN",
+  "name": "User full name"
 }
 ```
 

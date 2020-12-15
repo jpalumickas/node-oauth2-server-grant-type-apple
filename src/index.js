@@ -60,6 +60,7 @@ class AppleGrantType extends AbstractGrantType {
 
   async getUser(request) {
     const token = request.body.apple_token;
+    const name = request.body.name;
 
     if (!token) {
       throw new InvalidRequestError('Missing parameter: `apple_token`');
@@ -77,7 +78,7 @@ class AppleGrantType extends AbstractGrantType {
       throw new InvalidTokenError('Apple token is invalid or expired');
     }
 
-    return await this.model.getUserWithApple(data);
+    return await this.model.getUserWithApple({ name, ...data });
   }
 
   async saveToken(user, client, scope) {
