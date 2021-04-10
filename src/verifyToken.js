@@ -7,10 +7,15 @@ const jwksClient = jwksRsaClient({
 });
 
 const getKey = (header, callback) => {
-  jwksClient.getSigningKeyAsync(header.kid, (err, key) => {
-    const signingKey = key.getPublicKey();
-    callback(null, signingKey);
-  });
+  jwksClient
+    .getSigningKey(header.kid)
+    .then((key) => {
+      const signingKey = key.getPublicKey();
+      callback(null, signingKey);
+    })
+    .catch((err) => {
+      callback(err);
+    });
 };
 
 const ISSUER = 'https://appleid.apple.com';
