@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { VerifyOptions, GetPublicKeyOrSecret } from 'jsonwebtoken';
 import jwksRsaClient from 'jwks-rsa';
 
 const jwksClient = jwksRsaClient({
@@ -6,7 +6,7 @@ const jwksClient = jwksRsaClient({
   jwksUri: 'https://appleid.apple.com/auth/keys',
 });
 
-const getKey = (header, callback) => {
+const getKey: GetPublicKeyOrSecret = (header, callback) => {
   jwksClient
     .getSigningKey(header.kid)
     .then((key) => {
@@ -22,14 +22,22 @@ const ISSUER = 'https://appleid.apple.com';
 
 // jwt only supports callback now
 // https://github.com/auth0/node-jsonwebtoken/issues/111
-const verifyToken = ({ token, ...rest }) => {
+const verifyToken = ({
+  token,
+  audience,
+  ...rest
+}: {
+  token: string;
+  audience?: VerifyOptions['audience'];
+}) => {
   return new Promise((resolve, reject) => {
     jwt.verify(
       token,
       getKey,
       {
-        algorithm: 'RS256',
+        algorithms: ['RS256'],
         issuer: ISSUER,
+        audience,
         ...rest,
       },
       (err, data) => {
@@ -38,7 +46,7 @@ const verifyToken = ({ token, ...rest }) => {
         }
 
         resolve(data);
-      }
+      },
     );
   });
 };
