@@ -4,6 +4,7 @@
   "description": "Apple grant type for oauth2-server",
   "main": "dist/oauth2-server-grant-type-apple.js",
   "module": "dist/oauth2-server-grant-type-apple.modern.js",
+  "types": "dist/index.d.ts",
   "source": "./src/index.ts",
   "files": [
     "dist",
