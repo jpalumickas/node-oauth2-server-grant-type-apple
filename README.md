@@ -27,7 +27,7 @@ Add `getUserWithApple` to [oauth2-server] model.
     // Find and return user by Apple email
 
     // If not exists create new user
-  };
+  }
 ```
 
 Add Apple grant type to `extendedGrantTypes` in [oauth2-server] options:

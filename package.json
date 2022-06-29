@@ -19,17 +19,17 @@
   "license": "MIT",
   "dependencies": {
     "jsonwebtoken": "^8.5.1",
-    "jwks-rsa": "^2.0.5"
+    "jwks-rsa": "^2.1.4"
   },
   "peerDependencies": {
     "oauth2-server": "3.x"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^8.5.5",
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/oauth2-server": "^3.0.13",
-    "microbundle": "^0.14.1",
+    "microbundle": "^0.15.0",
     "oauth2-server": "^3.1.1",
-    "prettier": "^2.4.1",
+    "prettier": "^2.7.1",
     "rimraf": "^3.0.2"
   },
   "scripts": {
