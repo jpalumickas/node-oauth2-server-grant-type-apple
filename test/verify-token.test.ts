@@ -4,13 +4,17 @@ import { generateKeyPair, SignJWT } from 'jose';
 const state = vi.hoisted(() => ({
   privateKey: undefined as unknown as CryptoKey,
   publicKey: undefined as unknown as CryptoKey,
+  jwksUrl: undefined as URL | undefined,
 }));
 
 vi.mock('jose', async (importOriginal) => {
   const actual = await importOriginal<typeof import('jose')>();
   return {
     ...actual,
-    createRemoteJWKSet: () => async () => state.publicKey,
+    createRemoteJWKSet: (url: URL) => {
+      state.jwksUrl = url;
+      return async () => state.publicKey;
+    },
   };
 });
 
@@ -39,6 +43,10 @@ beforeAll(async () => {
 });
 
 describe('verifyToken', () => {
+  it('configures the JWKS resolver with the Apple endpoint', () => {
+    expect(state.jwksUrl?.href).toBe('https://appleid.apple.com/auth/keys');
+  });
+
   it('returns the payload for a valid token', async () => {
     const token = await sign({ sub: 'user-123', email: 'a@example.com' });
 
@@ -92,5 +100,18 @@ describe('verifyToken', () => {
     await expect(
       verifyToken({ token: 'not-a-jwt', audience: APP_ID }),
     ).rejects.toThrow();
+  });
+
+  it('rejects a token signed with a key the JWKS does not return', async () => {
+    const otherKeys = await generateKeyPair('RS256', { extractable: true });
+    const token = await new SignJWT({ sub: 'user-1' })
+      .setProtectedHeader({ alg: 'RS256' })
+      .setIssuer(ISSUER)
+      .setAudience(APP_ID)
+      .setIssuedAt()
+      .setExpirationTime('1h')
+      .sign(otherKeys.privateKey as CryptoKey);
+
+    await expect(verifyToken({ token, audience: APP_ID })).rejects.toThrow();
   });
 });

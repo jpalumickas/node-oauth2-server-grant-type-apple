@@ -76,7 +76,14 @@ describe('AppleGrantType constructor', () => {
     expect(() => new AppleGrantType(buildOptions(model))).toThrow(/saveToken/);
   });
 
-  it('throws if appleGrantType.appId is missing', () => {
+  it('throws if appleGrantType config is missing entirely', () => {
+    const model = buildModel();
+    delete (model as Partial<Model>).appleGrantType;
+
+    expect(() => new AppleGrantType(buildOptions(model))).toThrow(/appId/);
+  });
+
+  it('throws if appleGrantType.appId is undefined', () => {
     const model = buildModel({
       appleGrantType: { appId: undefined as unknown as string },
     });
@@ -195,18 +202,34 @@ describe('AppleGrantType.getUser', () => {
       aud: APP_ID,
     });
   });
+
+  it('forwards all configured appIds as the audience', async () => {
+    vi.mocked(verifyToken).mockResolvedValue({ sub: 's', aud: APP_ID });
+    const ids = ['com.example.app', 'com.example.app.dev'];
+    const model = buildModel({ appleGrantType: { appId: ids } });
+    const grant = new AppleGrantType(buildOptions(model));
+
+    await grant.getUser(buildRequest({ apple_token: 'tok' }));
+
+    expect(verifyToken).toHaveBeenCalledWith({
+      token: 'tok',
+      audience: ids,
+    });
+  });
 });
 
 describe('AppleGrantType.saveToken', () => {
-  it('only persists user.id on the token', async () => {
+  it('trims user on the token but forwards the full user to model.saveToken', async () => {
     const model = buildModel();
     const grant = new AppleGrantType(buildOptions(model));
 
     const user: User = { id: 'user-42', email: 'secret@example.com' };
     await grant.saveToken(user, CLIENT, ['read']);
 
-    const tokenArg = vi.mocked(model.saveToken).mock.calls[0][0];
+    const [tokenArg, , userArg] = vi.mocked(model.saveToken).mock.calls[0];
     expect(tokenArg.user).toEqual({ id: 'user-42' });
     expect(tokenArg.user).not.toHaveProperty('email');
+    expect(userArg).toEqual(user);
+    expect(userArg).toHaveProperty('email', 'secret@example.com');
   });
 });

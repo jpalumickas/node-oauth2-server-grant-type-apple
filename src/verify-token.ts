@@ -12,11 +12,11 @@ export const verifyToken = async ({
   token: string;
   audience?: string | string[];
 }): Promise<AppleTokenData> => {
-  const { payload } = await jwtVerify(token, JWKS, {
+  const { payload } = await jwtVerify<AppleTokenData>(token, JWKS, {
     algorithms: ['RS256'],
     issuer: ISSUER,
     audience,
   });
 
-  return payload as AppleTokenData;
+  return payload;
 };
