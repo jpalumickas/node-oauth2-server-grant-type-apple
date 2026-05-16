@@ -1,14 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
-    "module": "esnext",
-    "lib": ["esnext"],
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ESNext"],
+    "types": ["node"],
     "strict": true,
     "sourceMap": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
     "rootDir": "./src",
     "outDir": "./dist"
   },

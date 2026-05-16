@@ -1,15 +1,16 @@
 # OAuth2 Server Apple Grant Type
 
-Adds Apple grant type for [oauth2-server][oauth2-server]
+Adds Apple grant type for [@node-oauth/oauth2-server][oauth2-server]
 
 ## Installation
 
-Using Yarn
+Using pnpm
+
 ```sh
-yarn add oauth2-server-grant-type-apple
+pnpm add oauth2-server-grant-type-apple
 ```
 
-Using NPM
+Using npm
 
 ```sh
 npm install oauth2-server-grant-type-apple
@@ -17,36 +18,35 @@ npm install oauth2-server-grant-type-apple
 
 ## Usage
 
-
-Add `getUserWithApple` to [oauth2-server] model.
+Add `getUserWithApple` to [@node-oauth/oauth2-server][oauth2-server] model.
 
 ```js
-  const getUserWithApple = async (jwtData) => {
-    // Find and return user by Apple ID (sub in jwtData)
+  const getUserWithApple = async (appleData) => {
+    // Find and return user by Apple ID (sub in appleData)
 
     // Find and return user by Apple email
 
     // If not exists create new user
-  }
+  };
 ```
 
-Add Apple grant type to `extendedGrantTypes` in [oauth2-server] options:
+Add Apple grant type to `extendedGrantTypes` in [@node-oauth/oauth2-server][oauth2-server] options:
 
 ```js
-  import AppleGrantType from 'oauth2-server-grant-type-apple';
+  import { AppleGrantType } from 'oauth2-server-grant-type-apple';
 
   const options = {
     model: ...,
     extendedGrantTypes: {
       apple: AppleGrantType,
-    }
+    },
     requireClientAuthentication: {
       apple: false,
     },
   }
 ```
 
-You need to provide Apple App ID in model `appleGrantType`  :
+You need to provide Apple App ID in model `appleGrantType`:
 
 ```js
 const options = {
@@ -56,6 +56,7 @@ const options = {
       appId: 'com.example.apple.login' // Array also supported
     },
   },
+  extendedGrantTypes,
 }
 ```
 
@@ -74,4 +75,4 @@ Post request to `/oauth/token` with `apple` grant type and provided token:
 
 The package is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
-[oauth2-server]: https://github.com/oauthjs/node-oauth2-server
+[oauth2-server]: https://github.com/node-oauth/node-oauth2-server

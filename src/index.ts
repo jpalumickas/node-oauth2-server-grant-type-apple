@@ -1,28 +1,29 @@
 import {
-  User,
-  Client,
-  Token,
   AbstractGrantType,
   InvalidArgumentError,
   InvalidRequestError,
   InvalidTokenError,
-  TokenOptions,
+} from '@node-oauth/oauth2-server';
+import type {
   Request,
-} from 'oauth2-server';
-import verifyToken from './verifyToken';
-import { Model } from './types';
+  Client,
+  TokenOptions,
+  User,
+  Token,
+} from '@node-oauth/oauth2-server';
+import verifyToken from './verifyToken.js';
+import type { AppleTokenData, Model } from './types.js';
 
 export interface Options extends TokenOptions {
   model: Model;
 }
 
-class AppleGrantType extends AbstractGrantType {
+export class AppleGrantType extends AbstractGrantType {
   model: Model;
-  appIds: string[];
+  appIds: string[] = [];
 
   constructor(options: Options) {
     super(options);
-    this.model = options.model;
 
     if (!options.model) {
       throw new InvalidArgumentError('Missing parameter: `model`');
@@ -34,19 +35,23 @@ class AppleGrantType extends AbstractGrantType {
       );
     }
 
-    const appId = this.model.appleGrantType?.appId;
-
-    this.appIds = appId ? (Array.isArray(appId) ? appId : Array(appId)) : [];
-
-    if (!this.appIds.length) {
-      throw new InvalidArgumentError(
-        'Invalid argument: Apple valid appId must be provided in grant type options',
-      );
-    }
-
     if (!options.model.saveToken) {
       throw new InvalidArgumentError(
         'Invalid argument: model does not implement `saveToken()`',
+      );
+    }
+
+    this.model = options.model;
+
+    const appId = this.model.appleGrantType?.appId;
+
+    if (appId) {
+      this.appIds = Array.isArray(appId) ? appId : [appId];
+    }
+
+    if (this.appIds.length === 0) {
+      throw new InvalidArgumentError(
+        'Invalid argument: Apple valid appId must be provided in options',
       );
     }
 
@@ -78,40 +83,39 @@ class AppleGrantType extends AbstractGrantType {
       throw new InvalidRequestError('Missing parameter: `apple_token`');
     }
 
-    let data: object;
+    let data: AppleTokenData;
 
     try {
-      data = (await verifyToken({
+      data = await verifyToken({
         token,
         audience: this.appIds,
-      })) as object;
-    } catch (err) {
-      console.error(err);
-      throw new InvalidTokenError('Apple token is invalid or expired');
+      });
+    } catch {
+      throw new InvalidTokenError('Apple id token is invalid or expired');
     }
 
     return await this.model.getUserWithApple({ name, ...data });
   }
 
-  async saveToken(user: User, client: Client, scope: string | string[]) {
-    const scopeData = await this.validateScope(user, client, scope);
+  async saveToken(user: User, client: Client, scope: string[]) {
+    const validatedScope = await this.validateScope(user, client, scope);
     const accessToken = await this.generateAccessToken(client, user, scope);
     const refreshToken = await this.generateRefreshToken(client, user, scope);
     const accessTokenExpiresAt = this.getAccessTokenExpiresAt();
-    const refreshTokenExpiresAt = await this.getRefreshTokenExpiresAt();
+    const refreshTokenExpiresAt = this.getRefreshTokenExpiresAt();
 
     const token: Token = {
       accessToken,
       accessTokenExpiresAt,
       refreshToken,
       refreshTokenExpiresAt,
-      scope: scopeData || [],
-      user,
+      scope: validatedScope || [],
+      user: {
+        id: user.id,
+      },
       client,
     };
 
     return await this.model.saveToken(token, client, user);
   }
 }
-
-export default AppleGrantType;
