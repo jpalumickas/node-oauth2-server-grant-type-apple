@@ -8,12 +8,12 @@ import type { Request, Client, User } from '@node-oauth/oauth2-server';
 
 import type { AppleTokenData, Model } from '../src/types.js';
 
-vi.mock('../src/verifyToken.js', () => ({
-  default: vi.fn(),
+vi.mock('../src/verify-token.js', () => ({
+  verifyToken: vi.fn(),
 }));
 
-const { default: verifyToken } = await import('../src/verifyToken.js');
-const { AppleGrantType } = await import('../src/index.js');
+const { verifyToken } = await import('../src/verify-token.js');
+const { AppleGrantType } = await import('../src/apple-grant-type.js');
 
 const APP_ID = 'com.example.app';
 

@@ -5,7 +5,7 @@ const JWKS = createRemoteJWKSet(new URL('https://appleid.apple.com/auth/keys'));
 
 const ISSUER = 'https://appleid.apple.com';
 
-const verifyToken = async ({
+export const verifyToken = async ({
   token,
   audience,
 }: {
@@ -20,5 +20,3 @@ const verifyToken = async ({
 
   return payload as AppleTokenData;
 };
-
-export default verifyToken;

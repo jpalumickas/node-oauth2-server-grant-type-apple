@@ -14,7 +14,7 @@ vi.mock('jose', async (importOriginal) => {
   };
 });
 
-const { default: verifyToken } = await import('../src/verifyToken.js');
+const { verifyToken } = await import('../src/verify-token.js');
 
 const ISSUER = 'https://appleid.apple.com';
 const APP_ID = 'com.example.app';
